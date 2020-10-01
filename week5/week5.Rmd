@@ -101,7 +101,7 @@ We will use the grammar of graphics plotting (ggplot) tool.
 ggplot(practice_data, aes(distance, escape_velocity))+ # establish plot and define which dataset (tibble) to be used
   geom_point()+ # plot data as scatter of points
   geom_line(color='purple')+ # fit a line to the data
-  labs(x="Distance [m]", y="Escape velocity [m/s]",
+  labs(x="Distance [m]", y="Escape velocity [km/s]",
   title="relationship between escape velocity and distance (an inverse square-root)") # add labels and a title
 ```
 # Test your understanding (questions to practice)
@@ -111,17 +111,40 @@ ggplot(practice_data, aes(distance, escape_velocity))+ # establish plot and defi
 4. What do you think is the escape velocity for the solar system? Hint: you have already computed it. 
 
 # Solutions
-1. Print the contents of the solar system data tibble "ss_data". Then, print only the information relevant to the Earth and the Sun.
+**1. Print the contents of the solar system data tibble "ss_data". Then, print only the information relevant to the Earth and the Sun.**
 
 The first part of this questions is pretty straightfoward. The second part might require some investigating into R and tibble documentation to use subsetting to get only Sun and Earth rows:
 
 ```{r}
-#print(ss_data) # printing the contents of ss_data
-ss_data["body"]
+print(ss_data) # printing the contents of ss_data
+print(ss_data %>% filter(body=="sun")) # this data will be just for the sun
+print(ss_data %>% filter(body=="earth")) # this data will be just for the earth
 ```
 
-2. Compute the escape velocity for each body is ss_data and print
-3. Plot the escape velocity for each body in ss_data as a function of mass and then as a function of radius
-4. What do you think is the escape velocity for the solar system? Hint: you have already computed it. 
+**2. Compute the escape velocity for each body is ss_data and print**
 
+```{r}
+G <- 6.67E-11 # Newton's gravitational constant [m3/kgs2]
+newss_data <- 
+  ss_data %>% mutate(
+    esc_v = sqrt((2*G*m)/r)/1000) # convert to km/s
+
+print(newss_data) # prints tibble now including esc_v     
+
+```
+
+**3. Plot the escape velocity for each body in ss_data as a function of mass and then as a function of radius**
+
+```{r}
+ggplot(newss_data, aes(r, esc_v))+ # establish plot and define which dataset (tibble) to be used
+  geom_point()+ # plot data as scatter of points
+  scale_x_continuous(trans='log10')+ #set the x axis to be a log scale
+  labs(x="Distance [m]", y="Escape velocity [km/s]",
+  title="relationship between escape velocity and radius for bodies in the solar system")+ # add labels and a title
+  geom_text(aes(label=body),hjust=1, vjust=0) # add labels to the points
+```
+
+**4. What do you think is the escape velocity for the solar system? Hint: you have already computed it.**
+
+Given that the Sun is the central mass of the solar system, the escape velocity of the solar system is the escape velocity of the Sun.
 
